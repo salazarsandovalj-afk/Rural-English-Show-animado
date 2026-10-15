@@ -1,0 +1,336 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Rural English Show animado</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700&family=Source+Sans+3:wght@400;600&display=swap">
+<style>
+/* Layout: scene tabs, then a stage (poster + scoreboard, speech bubble, seven characters), controls and a tip per scene. */
+:root{
+  --bg:#EEF3EE; --surface:#FFFFFF; --fg:#17261E; --muted:#51635A; --line:#C9D7CD;
+  --accent:#17795A; --accent-fg:#FFFFFF; --sun:#E3A72F;
+  --board:#1E3A2E; --board-fg:#F1F6F0;
+  --c1:#4C8DC7; --c2:#D9923B; --c3:#6F9C4F; --c4:#B3639E; --c5:#3A9E98; --c6:#CC6A5C;
+  --font-display:"Bricolage Grotesque","Trebuchet MS",system-ui,sans-serif;
+  --font-body:"Source Sans 3",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#101A15; --surface:#18251E; --fg:#E8F0EA; --muted:#9DB0A4; --line:#2B3C33;
+    --accent:#4DC39B; --accent-fg:#08150F; --sun:#EDB84A;
+    --board:#0B120E; --board-fg:#F1F6F0;
+    --c1:#6AA6DD; --c2:#E5A55A; --c3:#8DB86D; --c4:#CC84B8; --c5:#5BBDB6; --c6:#E08A7C; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#101A15; --surface:#18251E; --fg:#E8F0EA; --muted:#9DB0A4; --line:#2B3C33;
+  --accent:#4DC39B; --accent-fg:#08150F; --sun:#EDB84A;
+  --board:#0B120E; --board-fg:#F1F6F0;
+  --c1:#6AA6DD; --c2:#E5A55A; --c3:#8DB86D; --c4:#CC84B8; --c5:#5BBDB6; --c6:#E08A7C; color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{
+  background:var(--bg); color:var(--fg); font-family:var(--font-body); font-size:16px; line-height:1.5;
+  padding-block:24px 40px;
+  padding-left:max(16px, env(safe-area-inset-left, 0px));
+  padding-right:max(16px, env(safe-area-inset-right, 0px));
+}
+.wrap{max-width:980px; margin:0 auto; display:flex; flex-direction:column; gap:20px}
+h1{font-family:var(--font-display); font-weight:700; font-size:clamp(1.6rem,4.5vw,2.3rem); line-height:1.1; margin:0; text-wrap:balance}
+.lead{margin:6px 0 0; color:var(--muted); max-width:64ch}
+.tabs{display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px}
+.tab{
+  font:inherit; text-align:left; cursor:pointer; background:var(--surface); color:var(--fg);
+  border:1px solid var(--line); border-radius:8px; padding:10px 12px; display:flex; flex-direction:column; gap:2px; min-width:0;
+}
+.tab small{color:var(--muted); font-size:.75rem; letter-spacing:.06em; text-transform:uppercase}
+.tab b{font-family:var(--font-display); font-weight:500; font-size:1rem; overflow-wrap:anywhere}
+.tab[aria-selected="true"]{background:var(--accent); color:var(--accent-fg); border-color:var(--accent)}
+.tab[aria-selected="true"] small{color:inherit; opacity:.85}
+:focus-visible{outline:3px solid var(--sun); outline-offset:2px}
+.stage{
+  background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:16px;
+  display:flex; flex-direction:column; gap:14px;
+}
+.top{display:grid; grid-template-columns:minmax(0,1fr) 190px; gap:12px; align-items:stretch}
+.top.noscore{grid-template-columns:minmax(0,1fr)}
+.poster{
+  background:var(--board); color:var(--board-fg); border-radius:8px; padding:12px; display:flex; flex-direction:column; gap:8px; min-width:0;
+}
+.poster .pt{font-family:var(--font-display); font-weight:700; letter-spacing:.08em; text-align:center; font-size:.95rem}
+.tiles{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px}
+.tile{
+  border-radius:6px; padding:8px 4px; text-align:center; background:var(--surface); color:var(--fg);
+  border:3px solid transparent; transition:transform .25s, border-color .25s; min-width:0;
+  border-top:8px solid var(--tc);
+}
+.tile b{display:block; font-family:var(--font-display); font-size:clamp(.9rem,2.6vw,1.2rem); font-weight:700; letter-spacing:.04em}
+.tile i{display:block; font-size:.78rem; color:var(--muted)}
+.tile.on{transform:scale(1.07); border-color:var(--sun)}
+.score{
+  border:1px solid var(--line); border-radius:8px; padding:12px; display:flex; flex-direction:column; gap:8px; background:var(--surface);
+}
+.score h3{margin:0; font-family:var(--font-display); font-size:.95rem; letter-spacing:.04em}
+.team{display:flex; align-items:baseline; justify-content:space-between; gap:8px}
+.team span{font-weight:600}
+.team strong{font-family:var(--font-display); font-size:1.9rem; line-height:1; font-variant-numeric:tabular-nums}
+.bubble{
+  position:relative; border:2px solid var(--fg); border-radius:12px; padding:12px 16px; min-height:112px; background:var(--surface);
+}
+.who{font-size:.82rem; font-weight:600; color:var(--accent); letter-spacing:.03em}
+.say{margin:2px 0 0; font-family:var(--font-display); font-size:clamp(1.1rem,3.4vw,1.5rem); font-weight:500; line-height:1.25; overflow-wrap:anywhere}
+.es{margin:4px 0 0; color:var(--muted); font-style:italic; overflow-wrap:anywhere}
+.cast{display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); gap:6px; padding-top:6px}
+.person{display:flex; flex-direction:column; align-items:center; text-align:center; opacity:.55; transition:opacity .3s}
+.person.on{opacity:1}
+.person svg{width:min(100%,72px); height:auto; transition:transform .3s}
+.person.on svg{transform:translateY(-6px) scale(1.08)}
+.person .rl{font-size:.78rem; font-weight:600; overflow-wrap:anywhere}
+.mouth{transform-origin:32px 34px}
+.person.on .mouth{animation:talk .35s ease-in-out infinite alternate}
+@keyframes talk{from{transform:scaleY(.5)}to{transform:scaleY(1.9)}}
+.action{border-left:4px solid var(--sun); padding:4px 0 4px 12px; margin:0; min-height:3.2em}
+.controls{display:flex; flex-wrap:wrap; align-items:center; gap:10px}
+.btn{
+  font:inherit; font-weight:600; cursor:pointer; background:var(--surface); color:var(--fg);
+  border:1px solid var(--line); border-radius:8px; padding:8px 14px; min-height:40px;
+}
+.btn.primary{background:var(--accent); color:var(--accent-fg); border-color:var(--accent); min-width:104px}
+.dots{display:flex; gap:6px; flex-wrap:wrap; margin-left:auto; align-items:center}
+.dot{width:14px; height:14px; border-radius:50%; border:2px solid var(--muted); background:transparent; padding:0; cursor:pointer}
+.dot.on{background:var(--accent); border-color:var(--accent)}
+.count{color:var(--muted); font-size:.9rem; font-variant-numeric:tabular-nums}
+.tipbox{background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:16px}
+.tipbox h2{font-family:var(--font-display); font-size:1.1rem; margin:0 0 6px}
+.tipbox p{margin:0}
+@media (max-width:700px){
+  .tabs{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .top{grid-template-columns:minmax(0,1fr)}
+  .cast{grid-template-columns:repeat(4,minmax(0,1fr))}
+  .dots{margin-left:0; width:100%}
+}
+@media (prefers-reduced-motion: reduce){
+  .person.on .mouth{animation:none}
+  .person svg,.tile,.person{transition:none}
+}
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>Rural English Show animado</h1>
+    <p class="lead">Las cuatro escenas del guión, con quién habla, qué dice en inglés y su traducción. Es una animación ilustrativa con personajes de ejemplo, no un video grabado.</p>
+  </header>
+
+  <nav class="tabs" role="tablist" aria-label="Escenas" id="tabs"></nav>
+
+  <section class="stage" aria-label="Simulación de la escena">
+    <div class="top" id="top">
+      <div class="poster">
+        <div class="pt">OUR FARM ANIMALS</div>
+        <div class="tiles" id="tiles"></div>
+      </div>
+      <div class="score" id="score" hidden>
+        <h3>Guess the Animal</h3>
+        <div class="team"><span>Team A</span><strong id="sa">0</strong></div>
+        <div class="team"><span>Team B</span><strong id="sb">0</strong></div>
+      </div>
+    </div>
+    <div class="bubble"><div class="who" id="who"></div><p class="say" id="say"></p><p class="es" id="es"></p></div>
+    <div class="cast" id="cast"></div>
+    <p class="action" id="action" aria-live="polite"></p>
+    <div class="controls">
+      <button class="btn" id="prev" type="button">Anterior</button>
+      <button class="btn primary" id="play" type="button">Pausar</button>
+      <button class="btn" id="next" type="button">Siguiente</button>
+      <span class="count" id="count"></span>
+      <div class="dots" id="dots" role="group" aria-label="Pasos"></div>
+    </div>
+  </section>
+
+  <section class="tipbox"><h2>Consejo para esta escena</h2><p id="tip"></p></section>
+</div>
+
+<script>
+/* Actor codes: 0 Host, 1 Presenter 1, 2 Presenter 2, 3 Game Master, 4 Artist, 5 Timekeeper, 6 Público, "all" todos. */
+var PEOPLE = [
+  {r:"Host", c:"var(--c1)", skin:"#F0C8A4", hair:"#2A1D16"},
+  {r:"Presenter 1", c:"var(--c2)", skin:"#C98F68", hair:"#1D1410"},
+  {r:"Presenter 2", c:"var(--c3)", skin:"#8D5A3C", hair:"#15100D"},
+  {r:"Game Master", c:"var(--c4)", skin:"#E3B58D", hair:"#5A3A22"},
+  {r:"Artist", c:"var(--c5)", skin:"#F0C8A4", hair:"#7A4B24"},
+  {r:"Timekeeper", c:"var(--c6)", skin:"#B07A56", hair:"#201712"}
+];
+var TILES = [
+  {n:"COW", k:"milk", c:"var(--c1)"}, {n:"HORSE", k:"fast", c:"var(--c2)"}, {n:"PIG", k:"mud", c:"var(--c6)"},
+  {n:"CHICKEN", k:"eggs", c:"var(--c4)"}, {n:"SHEEP", k:"wool", c:"var(--c5)"}, {n:"DOG", k:"friend", c:"var(--c3)"}
+];
+
+var SCENES = [
+ { tab:"Escena 1", name:"Saludo (2 min)",
+   tip:"Cada integrante dice su propio nombre donde el guión trae ___. Si alguien se pone nervioso, el grupo puede decir la frase junto con él la primera vez.",
+   steps:[
+    {a:0,t:"Hello, everyone! Welcome to Rural English Show!",es:"Hola a todos, bienvenidos al Rural English Show.",d:"El grupo se para frente al curso. El Host da un paso al frente y sonríe."},
+    {a:0,t:"My name is ___. Today, we talk about farm animals.",es:"Mi nombre es ___. Hoy hablamos de animales de la granja.",d:"El Host dice su propio nombre."},
+    {a:0,t:"Let me introduce my team.",es:"Les presento a mi equipo.",d:"El Host señala al grupo con la mano."},
+    {a:1,t:"Hi! I am ___. I am a presenter.",es:"¡Hola! Soy ___. Soy presentador.",d:"Presenter 1 da un paso al frente y saluda con la mano."},
+    {a:2,t:"Hello! I am ___. I am a presenter.",es:"¡Hola! Soy ___. Soy presentador.",d:"Presenter 2 hace lo mismo."},
+    {a:3,t:"Hi, friends! I am ___. I am the game master.",es:"¡Hola, amigos! Soy ___. Soy el director del juego.",d:"El Game Master saluda al público."},
+    {a:4,t:"Hello! I am ___. I made the poster.",es:"¡Hola! Soy ___. Hice el cartel.",d:"El Artist levanta el cartel."},
+    {a:5,t:"Hi! I am ___. I am the timekeeper.",es:"¡Hola! Soy ___. Soy el que controla el tiempo.",d:"El Timekeeper levanta el reloj o el celular."},
+    {a:0,t:"Are you ready? Let's start!",es:"¿Están listos? ¡Empecemos!",d:"El Host pregunta al público."},
+    {a:6,t:"Yes!",es:"¡Sí!",d:"El público responde en coro."}
+   ]},
+ { tab:"Escena 2", name:"La cartelera (5 min)",
+   tip:"Presenters: hablen despacio y miren al público, no al papel. Si olvidan una palabra, miren el cartel: el nombre del animal está escrito debajo del dibujo.",
+   steps:[
+    {a:0,t:"Look at our poster! Presenter one, please.",es:"¡Miren nuestro cartel! Presentador uno, por favor.",d:"El Host se hace a un lado y cede la palabra."},
+    {a:1,p:0,t:"This is a cow. The cow is big. It gives us milk.",es:"Esta es una vaca. La vaca es grande. Nos da leche.",d:"Presenter 1 señala la vaca."},
+    {a:1,p:1,t:"This is a horse. The horse is fast. People ride the horse.",es:"Este es un caballo. El caballo es rápido. La gente monta el caballo.",d:"Presenter 1 señala el caballo."},
+    {a:1,p:2,t:"This is a pig. The pig is pink. It lives in the mud.",es:"Este es un cerdo. El cerdo es rosado. Vive en el barro.",d:"Presenter 1 señala el cerdo."},
+    {a:0,t:"Thank you! Presenter two, your turn.",es:"¡Gracias! Presentador dos, es tu turno.",d:"El Host da la palabra al segundo presentador."},
+    {a:2,p:3,t:"This is a chicken. The chicken has two legs and wings. It lays eggs.",es:"Esta es una gallina. La gallina tiene dos patas y alas. Pone huevos.",d:"Presenter 2 señala la gallina."},
+    {a:2,p:4,t:"This is a sheep. The sheep is white and soft. It gives us wool.",es:"Esta es una oveja. La oveja es blanca y suave. Nos da lana.",d:"Presenter 2 señala la oveja."},
+    {a:2,p:5,t:"This is a dog. The dog is our friend. It takes care of the farm.",es:"Este es un perro. El perro es nuestro amigo. Cuida la granja.",d:"Presenter 2 señala el perro."},
+    {a:0,t:"Wow! Artist, what do you like about the poster?",es:"¡Wow! Artista, ¿qué te gusta del cartel?",d:"El Host se dirige al Artist."},
+    {a:4,p:0,t:"I like the colors. The cow is my favorite animal!",es:"Me gustan los colores. ¡La vaca es mi animal favorito!",d:"El Artist responde con sus propias palabras del guión."},
+    {a:0,t:"Thank you! Now, let's play a game!",es:"¡Gracias! ¡Ahora vamos a jugar!",d:"El Host anuncia el juego."}
+   ]},
+ { tab:"Escena 3", name:"Guess the Animal (6 min)",
+   tip:"Si el público no se atreve a hablar, repita la pista más despacio y señale el dibujo correcto con un gesto. Premie cada intento con un aplauso, aunque se equivoquen.",
+   steps:[
+    {a:3,show:true,t:"Welcome to Guess the Animal! Team A and Team B, are you ready?",es:"Bienvenidos a Adivina el animal. Equipo A y equipo B, ¿están listos?",d:"La mitad izquierda del salón es Team A y la derecha es Team B. El Timekeeper escribe A y B en el tablero."},
+    {a:6,t:"Yes!",es:"¡Sí!",d:"El público responde."},
+    {a:3,t:"I read a clue. Raise your hand and say: I think it is a...",es:"Leo una pista. Levanten la mano y digan: Creo que es un/una…",d:"El Game Master explica la regla."},
+    {a:3,t:"It is big. It gives us milk. What is it?",es:"Es grande. Nos da leche. ¿Qué es?",d:"Primera pista."},
+    {a:6,p:0,t:"I think it is a cow!",es:"¡Creo que es una vaca!",d:"Un estudiante del Team A levanta la mano y responde."},
+    {a:3,p:0,s:[1,0],t:"Correct! One point for Team A!",es:"¡Correcto! Un punto para el equipo A.",d:"El Timekeeper anota una raya en el tablero."},
+    {a:3,t:"It has two legs and wings. It lays eggs. What is it?",es:"Tiene dos patas y alas. Pone huevos. ¿Qué es?",d:"Segunda pista."},
+    {a:6,p:4,t:"I think it is a sheep!",es:"¡Creo que es una oveja!",d:"Un estudiante se equivoca."},
+    {a:3,t:"Nice try! Try again.",es:"¡Buen intento! Intenta de nuevo.",d:"El Game Master anima al público y no corrige con enojo."},
+    {a:6,p:3,t:"I think it is a chicken!",es:"¡Creo que es una gallina!",d:"Un estudiante del Team B responde."},
+    {a:3,p:3,s:[1,1],t:"Correct! One point for Team B!",es:"¡Correcto! Un punto para el equipo B.",d:"El Timekeeper anota la raya de Team B."},
+    {a:3,t:"It is pink. It lives in the mud. What is it?",es:"Es rosado. Vive en el barro. ¿Qué es?",d:"Tercera pista."},
+    {a:6,p:2,t:"I think it is a pig!",es:"¡Creo que es un cerdo!",d:"Responde el Team A."},
+    {a:3,p:2,s:[2,1],t:"Correct! One point for Team A!",es:"¡Correcto! Un punto para el equipo A.",d:"El marcador queda 2 a 1."},
+    {a:3,t:"Now, point and say! I point, you say the animal.",es:"Ahora, señala y di. Yo señalo y ustedes dicen el animal.",d:"Ronda 2: el Game Master señala los dibujos en desorden."},
+    {a:6,p:1,t:"Horse! Dog! Cow!",es:"¡Caballo! ¡Perro! ¡Vaca!",d:"Todo el público dice los nombres en inglés, en coro."},
+    {a:5,t:"Time is up! Let's count the points.",es:"¡Se acabó el tiempo! Contemos los puntos.",d:"El Timekeeper avisa el fin del tiempo."},
+    {a:3,t:"The winner is Team ___! Congratulations!",es:"¡El ganador es el equipo ___! ¡Felicitaciones!",d:"En este ejemplo gana Team A. Todos aplauden."}
+   ]},
+ { tab:"Escena 4", name:"Despedida (2 min)",
+   tip:"Vuelvan a ponerse en fila antes de despedirse. Un aplauso final entre todos cierra el programa y deja una buena impresión.",
+   steps:[
+    {a:0,t:"Thank you for watching Rural English Show!",es:"¡Gracias por ver el Rural English Show!",d:"El grupo vuelve a la fila. El Host da un paso al frente."},
+    {a:0,t:"Thank you, teacher! Thank you, friends!",es:"¡Gracias, profesor! ¡Gracias, amigos!",d:"El Host agradece al docente y al público."},
+    {a:0,t:"Goodbye, everyone! See you next time!",es:"¡Adiós a todos! ¡Nos vemos la próxima vez!",d:"El Host se despide."},
+    {a:"all",t:"Goodbye!",es:"¡Adiós!",d:"Todo el grupo saluda con la mano y hace una pequeña reverencia."}
+   ]}
+];
+
+var $ = function(id){return document.getElementById(id)};
+var sc = 0, step = 0, playing = false, timer = null;
+var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+function faceSvg(p, small){
+  return '<svg viewBox="0 0 64 64" aria-hidden="true">' +
+    '<path d="M6 64c0-14 11-22 26-22s26 8 26 22z" fill="'+p.c+'"/>' +
+    '<circle cx="32" cy="27" r="14" fill="'+p.skin+'"/>' +
+    '<path d="M17.5 25a14.5 14 0 0 1 29 0c-7-5-22-5-29 0z" fill="'+p.hair+'"/>' +
+    '<circle cx="27" cy="28" r="1.8" fill="#1B1B1B"/><circle cx="37" cy="28" r="1.8" fill="#1B1B1B"/>' +
+    '<ellipse class="mouth" cx="32" cy="34" rx="4" ry="1.5" fill="#7A2F2F"/></svg>';
+}
+function buildCast(){
+  var h = "";
+  PEOPLE.forEach(function(p){
+    h += '<div class="person">'+faceSvg(p)+'<span class="rl">'+p.r+'</span></div>';
+  });
+  h += '<div class="person"><svg viewBox="0 0 96 64" aria-hidden="true">' +
+    '<path d="M2 64c0-10 8-16 18-16s18 6 18 16z" fill="var(--c1)"/><circle cx="20" cy="38" r="9" fill="#E3B58D"/><circle cx="20" cy="35" r="9" fill="#3A2A1E" opacity=".0"/>' +
+    '<path d="M30 64c0-10 8-16 18-16s18 6 18 16z" fill="var(--c3)"/><circle cx="48" cy="38" r="9" fill="#8D5A3C"/>' +
+    '<path d="M58 64c0-10 8-16 18-16s18 6 18 16z" fill="var(--c4)"/><circle cx="76" cy="38" r="9" fill="#F0C8A4"/>' +
+    '<ellipse class="mouth" cx="48" cy="42" rx="3" ry="1.2" fill="#7A2F2F"/></svg><span class="rl">Público</span></div>';
+  $("cast").innerHTML = h;
+}
+function buildTiles(){
+  var h = "";
+  TILES.forEach(function(t){
+    h += '<div class="tile" style="--tc:'+t.c+'"><b>'+t.n+'</b><i>'+t.k+'</i></div>';
+  });
+  $("tiles").innerHTML = h;
+}
+function buildTabs(){
+  var h = "";
+  SCENES.forEach(function(s,i){
+    h += '<button class="tab" role="tab" type="button" data-i="'+i+'" aria-selected="'+(i===sc)+'"><small>'+s.tab+'</small><b>'+s.name+'</b></button>';
+  });
+  $("tabs").innerHTML = h;
+  Array.prototype.forEach.call($("tabs").children, function(b){
+    b.addEventListener("click", function(){ selectScene(+b.getAttribute("data-i")); });
+  });
+}
+function buildDots(){
+  var n = SCENES[sc].steps.length, h = "";
+  for(var i=0;i<n;i++){ h += '<button class="dot" type="button" data-i="'+i+'" aria-label="Paso '+(i+1)+'"></button>'; }
+  $("dots").innerHTML = h;
+  Array.prototype.forEach.call($("dots").children, function(b){
+    b.addEventListener("click", function(){ go(+b.getAttribute("data-i")); restart(); });
+  });
+}
+function scoreAt(upto){
+  var a = 0, b = 0, steps = SCENES[sc].steps;
+  for(var i=0;i<=upto;i++){ if(steps[i].s){ a = steps[i].s[0]; b = steps[i].s[1]; } }
+  return [a,b];
+}
+function whoLabel(a){
+  if(a === "all") return "Todo el grupo";
+  if(a === 6) return "Público";
+  return PEOPLE[a].r;
+}
+function show(){
+  var s = SCENES[sc], d = s.steps[step], n = s.steps.length;
+  Array.prototype.forEach.call($("cast").children, function(el,i){
+    var on = (d.a === "all") || (d.a === i);
+    el.classList.toggle("on", on);
+  });
+  Array.prototype.forEach.call($("tiles").children, function(el,i){
+    el.classList.toggle("on", d.p === i);
+  });
+  var showScore = (sc === 2) && step >= 0;
+  $("score").hidden = !showScore;
+  $("top").classList.toggle("noscore", !showScore);
+  var sco = scoreAt(step);
+  $("sa").textContent = sco[0]; $("sb").textContent = sco[1];
+  $("who").textContent = whoLabel(d.a);
+  $("say").textContent = d.t;
+  $("es").textContent = d.es;
+  $("action").textContent = d.d;
+  $("count").textContent = "Paso " + (step+1) + " de " + n;
+  $("tip").textContent = s.tip;
+  Array.prototype.forEach.call($("dots").children, function(el,i){ el.classList.toggle("on", i===step); });
+}
+function go(i){
+  var n = SCENES[sc].steps.length;
+  step = (i % n + n) % n;
+  show();
+}
+function restart(){
+  clearTimeout(timer);
+  if(playing){ timer = setTimeout(function(){ go(step+1); restart(); }, 5200); }
+}
+function setPlaying(v){
+  playing = v;
+  $("play").textContent = v ? "Pausar" : "Reproducir";
+  restart();
+}
+function selectScene(i){
+  sc = i; step = 0;
+  Array.prototype.forEach.call($("tabs").children, function(b,k){ b.setAttribute("aria-selected", k===i); });
+  buildDots(); show(); restart();
+}
+$("prev").addEventListener("click", function(){ go(step-1); restart(); });
+$("next").addEventListener("click", function(){ go(step+1); restart(); });
+$("play").addEventListener("click", function(){ setPlaying(!playing); });
+
+buildCast(); buildTiles(); buildTabs(); buildDots(); show();
+setPlaying(!reduce);
+</script>
+
+</body></html>
